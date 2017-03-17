@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <MultiSelectListPreference
+        android:key="pref_key"
+        android:title="Catégories"
+        android:entries="@array/pref_default_entries"
+        android:entryValues="@array/pref_default_values">
+    </MultiSelectListPreference>
+</PreferenceScreen>
