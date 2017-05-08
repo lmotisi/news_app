@@ -37,7 +37,7 @@
                 android:layout_gravity="center"
                 android:layout_width="300dp"
                 android:layout_height="80dp"
-                android:text="Contre toute attente, Léa réussi à acheter ses amiibos en rupture de stock."
+                android:text="Titre de l'article"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold"
                 android:gravity="center"

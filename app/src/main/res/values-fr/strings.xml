@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Actualités</string>
     <string name="action_settings">Préférences</string>
+    <string name="articles_category">Derniers Articles</string>
+    <string name="prefs_category">Catégories</string>
 </resources>

@@ -10,8 +10,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,37 +31,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
+        getArticles();
+    }
 
-        Retrofit retrofit =  new Retrofit.Builder()
-                .baseUrl("https://www.goglasses.fr/").addConverterFactory(JacksonConverterFactory.create())
-                .build();
-
-        APIInterface api = retrofit.create(APIInterface.class);
-
-        Call<ListCategories> call = api.getCategories();
-
-        call.enqueue(new Callback<ListCategories>() {
-            @Override
-            public void onResponse(Call<ListCategories> call, retrofit2.Response<ListCategories> response) {
-                ArrayList<Categorie> categories = response.body().categories;
-
-                viewPager = (ViewPager) findViewById(R.id.view_pager);
-
-                viewPager.setAdapter(new
-                        PageAdapter(getSupportFragmentManager(), categories));
-
-                TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
-                tabLayout.setupWithViewPager(viewPager);
-            }
-
-            @Override
-            public void onFailure(Call<ListCategories> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
-
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -75,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             displayPreference();
             return true;
-        } else {
-            notif();
         }
 
         return super.onOptionsItemSelected(item);
@@ -87,19 +64,55 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void notif()
-    {
-        NotificationCompat.Builder notification =
-            new NotificationCompat.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Notif random")
-                .setContentText("Notification qui ne sert à rien");
 
+    public void getArticles() {
+        Retrofit retrofit =  new Retrofit.Builder()
+                .baseUrl("https://www.goglasses.fr/").addConverterFactory(JacksonConverterFactory.create())
+                .build();
 
-        NotificationManager notificationManager =
-            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        APIInterface api = retrofit.create(APIInterface.class);
 
-        notificationManager.notify(id, notification.build());
+        Call<ListCategories> call = api.getCategories();
 
+        call.enqueue(new Callback<ListCategories>() {
+            @Override
+            public void onResponse(Call<ListCategories> call, retrofit2.Response<ListCategories> response) {
+                ArrayList<Categorie> allCategories = response.body().categories;
+
+                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+
+                String[] resCategories = sharedPrefs.getStringSet("pref_key", null).toArray(new String[] {});
+
+                ArrayList<Categorie> categories = new ArrayList<>();
+                Categorie lastPostsCategory = new Categorie();
+                lastPostsCategory.id = -1;
+                lastPostsCategory.title = getContext().getResources().getString(R.string.articles_category);
+                categories.add(lastPostsCategory);
+
+                for (Categorie categorie : allCategories) {
+                    if (Arrays.asList(resCategories).contains(categorie.slug)) {
+                        categories.add(categorie);
+                    }
+                }
+
+                viewPager = (ViewPager) findViewById(R.id.view_pager);
+
+                viewPager.setAdapter(new
+                        PageAdapter(getSupportFragmentManager(), categories));
+
+                TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+                tabLayout.setupWithViewPager(viewPager);
+            }
+
+            @Override
+            public void onFailure(Call<ListCategories> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
+
+    public Context getContext() {
+        return (Context)this;
+    }
+
 }

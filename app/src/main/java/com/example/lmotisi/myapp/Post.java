@@ -31,6 +31,7 @@ public class Post implements Parcelable {
     @JsonProperty("attachments")
     public ArrayList<Attachment> attachments;
 
+    public Author author;
 
     public Date date;
 
@@ -73,6 +74,7 @@ public class Post implements Parcelable {
         dest.writeString(this.excerpt);
         dest.writeString(this.url);
         dest.writeTypedList(this.attachments);
+        dest.writeParcelable(this.author, flags);
         dest.writeLong(this.date != null ? this.date.getTime() : -1);
     }
 
@@ -82,6 +84,7 @@ public class Post implements Parcelable {
         this.excerpt = in.readString();
         this.url = in.readString();
         this.attachments = in.createTypedArrayList(Attachment.CREATOR);
+        this.author = in.readParcelable(Author.class.getClassLoader());
         long tmpDate = in.readLong();
         this.date = tmpDate == -1 ? null : new Date(tmpDate);
     }

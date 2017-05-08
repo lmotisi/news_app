@@ -41,22 +41,42 @@ public class ListFragment extends Fragment implements OnListItemClickListener{
 
         APIInterface api = retrofit.create(APIInterface.class);
 
-        Call<Response> call = api.getPostsByCategory(categoryID);
+        Call<Response> categoryCall = api.getPostsByCategory(categoryID);
+        Call<Response> lastPostsCall = api.getLastPosts();
 
-        call.enqueue(new Callback<Response>() {
-            @Override
-            public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
+        if(this.categoryID == -1) {
+            lastPostsCall.enqueue(new Callback<Response>() {
+                @Override
+                public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
 
-                ArrayList<Post> news = response.body().posts;
+                    ArrayList<Post> news = response.body().posts;
 
-                recyclerView.setAdapter(new MainAdapter(news, listener));
-            }
+                    recyclerView.setAdapter(new MainAdapter(news, listener));
+                }
 
-            @Override
-            public void onFailure(Call<Response> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
+                @Override
+                public void onFailure(Call<Response> call, Throwable t) {
+                    t.printStackTrace();
+                }
+            });
+
+        } else {
+
+            categoryCall.enqueue(new Callback<Response>() {
+                @Override
+                public void onResponse(Call<Response> call, retrofit2.Response<Response> response) {
+
+                    ArrayList<Post> news = response.body().posts;
+
+                    recyclerView.setAdapter(new MainAdapter(news, listener));
+                }
+
+                @Override
+                public void onFailure(Call<Response> call, Throwable t) {
+                    t.printStackTrace();
+                }
+            });
+        }
     }
 
     public static ListFragment newInstance(int categoryID) {

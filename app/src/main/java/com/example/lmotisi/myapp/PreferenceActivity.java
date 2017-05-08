@@ -1,7 +1,12 @@
 package com.example.lmotisi.myapp;
 
+import android.app.NotificationManager;
+import android.content.Context;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import static android.R.attr.id;
 
 public class PreferenceActivity extends AppCompatActivity {
 
@@ -14,4 +19,6 @@ public class PreferenceActivity extends AppCompatActivity {
                 .commit();
 
     }
+
+
 }

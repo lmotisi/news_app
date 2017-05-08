@@ -2,6 +2,7 @@ package com.example.lmotisi.myapp;
 
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +11,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-
+import java.text.DateFormat;
 import java.util.ArrayList;
+
+import static java.text.DateFormat.SHORT;
 
 public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private ArrayList<Post> news;
@@ -44,6 +47,8 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private TextView title;
         private TextView content;
         private ImageView image;
+        private TextView date;
+        private TextView author;
         private OnListItemClickListener listener;
 
         MyViewHolder(View itemView, OnListItemClickListener listItemClickListener, Context context) {
@@ -53,18 +58,32 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             this.context = context;
             itemView.setOnClickListener(this);
             content = (TextView) itemView.findViewById(R.id.content);
+            author = (TextView) itemView.findViewById(R.id.origine);
+            date = (TextView) itemView.findViewById(R.id.date);
             image = (ImageView) itemView.findViewById(R.id.newsImage);
         }
 
         void bindValue(Post news) {
+
             itemView.setTag(news);
             title.setText(news.title);
             content.setText(news.excerpt);
+            author.setText(news.author.name);
+            String dateFormat = DateFormat.getDateInstance(SHORT).format(news.date);
+            String timeFormat = DateFormat.getTimeInstance(SHORT).format(news.date);
+            date.setText(", le " + dateFormat + " à " + timeFormat);
+
             if(!news.attachments.isEmpty()) {
                 Picasso.with(context)
                         .load(news.attachments.get(0).url)
-                        .error(R.drawable.article1)
-                        .placeholder(R.drawable.article1)
+                        .error(R.drawable.missing_image)
+                        .placeholder(R.drawable.missing_image)
+                        .into(image);
+            } else {
+                Picasso.with(context)
+                        .load(R.drawable.missing_image)
+                        .error(R.drawable.missing_image)
+                        .placeholder(R.drawable.missing_image)
                         .into(image);
             }
         }
